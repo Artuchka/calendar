@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>google calendar clone!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 2rem;
+        }
+
+        body.no-scroll {
+            overflow-y: hidden;
+
+        }
+
+
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+    </style>
+<script defer src="main.js"></script><script defer src="libs.js"></script></head>
+
+<body>
+
+    <template id="calendarDay">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            [data-calendarDate]:has([data-addEventBtn]) {
+                padding: 0.3rem 0.3rem 1rem;
+                display: flex;
+                flex-direction: column;
+                /* align-items: center; */
+
+
+                min-width: 100px;
+                min-height: 200px;
+                border: 1px solid black;
+                text-align: center;
+                background-color: gray;
+            }
+
+            [data-calendarDate].current {
+                background-color: #fff;
+            }
+
+            /* so we can call our addEvent event clicking on text */
+            /* [data-calendarDate]>* {
+                pointer-events: none;
+            } */
+
+            [data-addEventBtn] {
+                align-self: flex-end;
+                width: 20px;
+                height: 20px;
+            }
+
+            [data-eventsList] {
+                display: flex;
+                flex-direction: column;
+                list-style-type: none;
+                gap: 0.5rem;
+            }
+
+            [data-calendarDate] .hidden {
+                display: none;
+            }
+
+            button:has(span[data-amountLeft]) {
+                background-color: gray;
+                border: none;
+                outline: none;
+
+                color: black;
+            }
+
+            span[data-amountLeft] {
+                display: inline;
+            }
+        </style>
+        <div data-calendarDate>
+            <button data-addEventBtn>+</button>
+            <div class="dateInfo">
+                <div data-dayOfWeek></div>
+                <div data-dayOfMonth></div>
+            </div>
+            <div class="eventsList" data-eventsList>
+            </div>
+            <button class="hidden">+ <span data-amountLeft>0</span> more</button>
+
+        </div>
+    </template>
+
+    <template id="eventAllDay">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .event {
+                --bgColor: blue;
+                background-color: var(--bgColor);
+                color: white;
+                border-radius: .3rem;
+                padding: 0.1rem;
+            }
+        </style>
+        <div class="event">
+            <span class="info" data-info>
+                info is here
+            </span>
+        </div>
+    </template>
+    <template id="eventCertain">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .event {
+                --bgColor: blue;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .event .circle {
+                width: 0.5em;
+                height: 0.5em;
+                border-radius: 50%;
+                background-color: var(--bgColor, red);
+            }
+
+            .event .time {
+                color: gray;
+            }
+        </style>
+        <div class="event">
+            <div class="circle"></div>
+            <time class="time" data-time>
+
+            </time>
+            <span class="info" data-info>
+
+            </span>
+        </div>
+    </template>
+
+    <template id="showModal">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .modal {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                background-color: #fff;
+                translate: -50% -50%;
+                padding: 2rem;
+                border: 1px solid orange;
+                z-index: 2;
+                max-width: 200px;
+                width: 100%;
+            }
+
+            .modalbg {
+                position: absolute;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.524);
+                z-index: 1;
+                min-height: 100vh;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .eventList {
+                display: flex;
+                flex-direction: column;
+                list-style-type: none;
+                gap: 0.5rem;
+            }
+        </style>
+        <div class="modal showModal">
+            <div class="header">
+                <div class="title" data-title>
+                    Show Modal
+                </div>
+                <div class="date" data-date>
+                    123
+                </div>
+            </div>
+            <ul class="eventList" data-eventList>
+            </ul>
+        </div>
+        <div class="modalbg" data-modalBg>
+        </div>
+    </template>
+    <template id="addModal">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .modal {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                background-color: #fff;
+                translate: -50% -50%;
+                padding: 2rem;
+                border: 1px solid orange;
+                z-index: 2;
+                max-width: 400px;
+                min-width: 200px;
+                width: 100%;
+            }
+
+            .modalbg {
+                position: absolute;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.524);
+                z-index: 1;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+            }
+
+
+
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: .5rem;
+            }
+
+            .time-range {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .time-range.disabled {
+                opacity: 0.6;
+                background-color: lightgray;
+            }
+
+            .time-range>* {
+                display: flex;
+                gap: 0.3rem;
+            }
+
+            .colors {
+                display: flex;
+                gap: 0.1rem;
+            }
+
+            .colors .color {
+                width: 30px;
+                height: 30px;
+                border-radius: .3em;
+            }
+
+            .color.color-blue {
+                background-color: lightblue;
+            }
+
+            .color.color-red {
+                background-color: lightcoral;
+            }
+
+            .color.color-green {
+                background-color: lightgreen;
+            }
+        </style>
+        <div class="modal showModal">
+            <div class="header">
+                <div class="title" data-title>
+                    Show Modal
+                </div>
+                <div class="date" data-date>
+                    123
+                </div>
+            </div>
+            <form>
+                <div class="name">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" data-name>
+                </div>
+                <div class="is-all-day">
+                    <input type="checkbox" name="" id="is-all-day" data-allDay>
+                    <label for="is-all-day">All Day?</label>
+                </div>
+                <div class="time-range" data-timeRange>
+                    <div class="start-time">
+                        <label for="start-time">Start Time</label>
+                        <input type="time" name="" id="start-time" min="00:00" max="23:59" data-startTime>
+                    </div>
+                    <div class="end-time">
+                        <label for="end-time">End Time</label>
+                        <input type="time" min="00:01" max="23:59" id="end-time" data-endTime>
+                    </div>
+                </div>
+                <div class="colors">
+                    <label for="color-1" class="color color-blue"></label>
+                    <label for="color-2" class="color color-red"></label>
+                    <label for="color-3" class="color color-green"></label>
+                    <input type="radio" name="colors" id="color-1" checked>
+                    <input type="radio" name="colors" id="color-2">
+                    <input type="radio" name="colors" id="color-3">
+                </div>
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        <div class="modalbg" data-modalBg>
+        </div>
+    </template>
+    <template id="editModal">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .modal {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                background-color: #fff;
+                translate: -50% -50%;
+                padding: 2rem;
+                border: 1px solid orange;
+                z-index: 2;
+                max-width: 400px;
+                min-width: 200px;
+                width: 100%;
+            }
+
+            .modalbg {
+                position: absolute;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.524);
+                z-index: 1;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+            }
+
+
+
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: .5rem;
+            }
+
+            .time-range {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .time-range.disabled {
+                opacity: 0.6;
+                background-color: lightgray;
+            }
+
+            .time-range>* {
+                display: flex;
+                gap: 0.3rem;
+            }
+
+            .colors {
+                display: flex;
+                gap: 0.1rem;
+            }
+
+            .colors .color {
+                width: 30px;
+                height: 30px;
+                border-radius: .3em;
+            }
+
+            .color.color-blue {
+                background-color: lightblue;
+            }
+
+            .color.color-red {
+                background-color: lightcoral;
+            }
+
+            .color.color-green {
+                background-color: lightgreen;
+            }
+        </style>
+        <div class="modal showModal">
+            <div class="header">
+                <div class="title" data-title>
+                    Show Modal
+                </div>
+                <div class="date" data-date>
+                    123
+                </div>
+            </div>
+            <form>
+                <div class="name">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" data-name>
+                </div>
+                <div class="is-all-day">
+                    <input type="checkbox" name="" id="is-all-day" data-allDay>
+                    <label for="is-all-day">All Day?</label>
+                </div>
+                <div class="time-range" data-timeRange>
+                    <div class="start-time">
+                        <label for="start-time">Start Time</label>
+                        <input type="time" name="" id="start-time" min="00:00" max="23:59" data-startTime>
+                    </div>
+                    <div class="end-time">
+                        <label for="end-time">End Time</label>
+                        <input type="time" min="00:01" max="23:59" id="end-time" data-endTime>
+                    </div>
+                </div>
+                <div class="colors">
+                    <label for="color-1" class="color color-blue"></label>
+                    <label for="color-2" class="color color-red"></label>
+                    <label for="color-3" class="color color-green"></label>
+                    <input type="radio" name="colors" id="color-1" checked>
+                    <input type="radio" name="colors" id="color-2">
+                    <input type="radio" name="colors" id="color-3">
+                </div>
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        <div class="modalbg" data-modalBg>
+        </div>
+    </template>
+
+
+    <div class="action-containaer">
+        <button data-todayBtn>
+            today
+        </button>
+        <button data-prevMonthBtn>
+            previous month
+        </button>
+        <button data-nextMonthBtn>
+            next month
+        </button>
+        <h2 data-calendarSelected></h2>
+    </div>
+    <div class="calendar-container" data-days-container></div>
+</body>
+
+</html>
