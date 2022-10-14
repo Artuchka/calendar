@@ -14,6 +14,7 @@
 
         body {
             padding: 2rem;
+            font-family: sans-serif;
         }
 
         body.no-scroll {
@@ -21,6 +22,34 @@
 
         }
 
+        .action-containaer {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2em;
+            align-items: center;
+
+        }
+
+        .action-containaer button {
+            background: transparent;
+            padding: 0.5em;
+            font-size: 1rem;
+            border: 1px solid black;
+            text-transform: capitalize;
+            cursor: pointer;
+            transition: all .3s;
+        }
+
+        .action-containaer button:hover {
+            background-color: rgba(57, 185, 113, 0.81);
+            color: white;
+            border-color: transparent;
+        }
+
+        .action-containaer button[data-prevMonthBtn],
+        .action-containaer button[data-nextMonthBtn] {
+            border-width: 0;
+        }
 
         .calendar-container {
             display: grid;
@@ -43,24 +72,18 @@
                 padding: 0.3rem 0.3rem 1rem;
                 display: flex;
                 flex-direction: column;
-                /* align-items: center; */
-
+                width: 100%;
 
                 min-width: 100px;
                 min-height: 200px;
-                border: 1px solid black;
+                border: 1px solid lightgray;
                 text-align: center;
-                background-color: gray;
+                background-color: rgb(221, 221, 221);
             }
 
             [data-calendarDate].current {
                 background-color: #fff;
             }
-
-            /* so we can call our addEvent event clicking on text */
-            /* [data-calendarDate]>* {
-                pointer-events: none;
-            } */
 
             [data-addEventBtn] {
                 align-self: flex-end;
@@ -73,22 +96,54 @@
                 flex-direction: column;
                 list-style-type: none;
                 gap: 0.5rem;
+                padding-left: .3rem;
+                padding-right: .3rem;
+                margin-top: .6rem;
             }
+
+            .dateInfo {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+
 
             [data-calendarDate] .hidden {
                 display: none;
             }
 
             button:has(span[data-amountLeft]) {
-                background-color: gray;
+                margin-top: 1rem;
+                background-color: rgba(128, 128, 128, 0.363);
                 border: none;
                 outline: none;
-
+                padding: 0.2em;
+                width: 50%;
+                align-self: center;
                 color: black;
+                pointer-events: none;
             }
 
             span[data-amountLeft] {
                 display: inline;
+            }
+
+            [data-addEventBtn] {
+                opacity: 0;
+                border: 1px solid black;
+                border-color: transparent;
+                font-size: 1rem;
+                font-weight: bold;
+                background-color: transparent;
+                pointer-events: none;
+                transition: opacity .2s, border-color .5s;
+                cursor: pointer;
+            }
+
+            [data-calendarDate]:hover [data-addEventBtn] {
+                opacity: 1;
+                pointer-events: all;
+                border-color: black;
             }
         </style>
         <div data-calendarDate>
@@ -116,8 +171,12 @@
                 --bgColor: blue;
                 background-color: var(--bgColor);
                 color: white;
-                border-radius: .3rem;
-                padding: 0.1rem;
+                border-radius: .15rem;
+                padding: 0.4rem;
+                width: 100%;
+                text-align: center;
+                /* text-align: left; */
+                /* text-indent: .3rem; */
             }
         </style>
         <div class="event">
@@ -179,9 +238,10 @@
                 background-color: #fff;
                 translate: -50% -50%;
                 padding: 2rem;
-                border: 1px solid orange;
+                border-radius: .5em;
                 z-index: 2;
-                max-width: 200px;
+                max-width: 400px;
+                min-width: 200px;
                 width: 100%;
             }
 
@@ -190,12 +250,21 @@
                 inset: 0;
                 background-color: rgba(0, 0, 0, 0.524);
                 z-index: 1;
-                min-height: 100vh;
             }
 
             .header {
                 display: flex;
                 justify-content: space-between;
+                margin-bottom: 1rem;
+            }
+
+            .header .title {
+                font-size: 1.5rem;
+            }
+
+            .header .date {
+                font-size: 1.2rem;
+                color: gray;
             }
 
             .eventList {
@@ -235,7 +304,7 @@
                 background-color: #fff;
                 translate: -50% -50%;
                 padding: 2rem;
-                border: 1px solid orange;
+                border-radius: .5em;
                 z-index: 2;
                 max-width: 400px;
                 min-width: 200px;
@@ -252,6 +321,16 @@
             .header {
                 display: flex;
                 justify-content: space-between;
+                margin-bottom: 1rem;
+            }
+
+            .header .title {
+                font-size: 1.5rem;
+            }
+
+            .header .date {
+                font-size: 1.2rem;
+                color: gray;
             }
 
 
@@ -259,7 +338,7 @@
             form {
                 display: flex;
                 flex-direction: column;
-                gap: .5rem;
+                gap: 1rem;
             }
 
             .time-range {
@@ -274,7 +353,16 @@
 
             .time-range>* {
                 display: flex;
+                flex-direction: column;
                 gap: 0.3rem;
+                flex-grow: 1;
+            }
+
+
+            .time-range input {
+                font-size: .9rem;
+                padding: 0.5em;
+                border: 1px solid gray;
             }
 
             .colors {
@@ -286,7 +374,17 @@
                 width: 30px;
                 height: 30px;
                 border-radius: .3em;
+                opacity: 0.5;
             }
+
+            .colors input {
+                display: none;
+            }
+
+            .colors input:checked+label {
+                opacity: 1;
+            }
+
 
             .color.color-blue {
                 background-color: lightblue;
@@ -298,6 +396,29 @@
 
             .color.color-green {
                 background-color: lightgreen;
+            }
+
+            button[type="submit"] {
+                cursor: pointer;
+                padding: 0.5em;
+                background-color: rgba(144, 238, 144, 0.425);
+                border: 1px solid green;
+                color: green;
+                border-radius: .3em;
+                font-size: 1rem;
+            }
+
+            .name {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 0.1rem;
+            }
+
+            .name input {
+                font-size: 1rem;
+                padding: 0.5em;
+                border: 1px solid gray;
             }
         </style>
         <div class="modal showModal">
@@ -312,7 +433,20 @@
             <form>
                 <div class="name">
                     <label for="name">Name</label>
-                    <input type="text" id="name" data-name>
+                    <input type="text" id="name" data-name list="namesList">
+
+                    <datalist id="namesList">
+                        <option value="event"></option>
+                        <option value="eventik"></option>
+                        <option value="bday"></option>
+                        <option value="birthday"></option>
+                        <option value="BD"></option>
+                        <option value="New Year"></option>
+                        <option value="Eve"></option>
+                        <option value="Russia Day"></option>
+                        <option value="Meeting"></option>
+                        <option value="Work Meeting"></option>
+                    </datalist>
                 </div>
                 <div class="is-all-day">
                     <input type="checkbox" name="" id="is-all-day" data-allDay>
@@ -328,13 +462,16 @@
                         <input type="time" min="00:01" max="23:59" id="end-time" data-endTime>
                     </div>
                 </div>
+                <span>Color</span>
                 <div class="colors">
-                    <label for="color-1" class="color color-blue"></label>
-                    <label for="color-2" class="color color-red"></label>
-                    <label for="color-3" class="color color-green"></label>
                     <input type="radio" name="colors" id="color-1" checked>
+                    <label for="color-1" class="color color-blue"></label>
+
                     <input type="radio" name="colors" id="color-2">
+                    <label for="color-2" class="color color-red"></label>
+
                     <input type="radio" name="colors" id="color-3">
+                    <label for="color-3" class="color color-green"></label>
                 </div>
                 <button type="submit">Add</button>
             </form>
@@ -357,7 +494,7 @@
                 background-color: #fff;
                 translate: -50% -50%;
                 padding: 2rem;
-                border: 1px solid orange;
+                border-radius: .5em;
                 z-index: 2;
                 max-width: 400px;
                 min-width: 200px;
@@ -374,14 +511,22 @@
             .header {
                 display: flex;
                 justify-content: space-between;
+                margin-bottom: 1rem;
             }
 
+            .header .title {
+                font-size: 1.5rem;
+            }
 
+            .header .date {
+                font-size: 1.2rem;
+                color: gray;
+            }
 
             form {
                 display: flex;
                 flex-direction: column;
-                gap: .5rem;
+                gap: 1rem;
             }
 
             .time-range {
@@ -396,7 +541,16 @@
 
             .time-range>* {
                 display: flex;
+                flex-direction: column;
                 gap: 0.3rem;
+                flex-grow: 1;
+            }
+
+
+            .time-range input {
+                font-size: .9rem;
+                padding: 0.5em;
+                border: 1px solid gray;
             }
 
             .colors {
@@ -408,7 +562,17 @@
                 width: 30px;
                 height: 30px;
                 border-radius: .3em;
+                opacity: 0.5;
             }
+
+            .colors input {
+                display: none;
+            }
+
+            .colors input:checked+label {
+                opacity: 1;
+            }
+
 
             .color.color-blue {
                 background-color: lightblue;
@@ -420,6 +584,49 @@
 
             .color.color-green {
                 background-color: lightgreen;
+            }
+
+            .buttons {
+                display: flex;
+                width: 100%;
+                gap: 1rem;
+            }
+
+            .buttons>* {
+                flex-grow: 1;
+            }
+
+            .btn {
+                cursor: pointer;
+                padding: 0.5em;
+                border: 1px solid gray;
+                border-radius: .3em;
+                font-size: 1rem;
+            }
+
+            .btn--success {
+                border-color: green;
+                color: green;
+                background-color: rgba(144, 238, 144, 0.425);
+            }
+
+            .btn--error {
+                border-color: red;
+                color: red;
+                background-color: rgba(238, 144, 144, 0.425);
+            }
+
+            .name {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 0.1rem;
+            }
+
+            .name input {
+                font-size: 1rem;
+                padding: 0.5em;
+                border: 1px solid gray;
             }
         </style>
         <div class="modal showModal">
@@ -434,7 +641,21 @@
             <form>
                 <div class="name">
                     <label for="name">Name</label>
-                    <input type="text" id="name" data-name>
+                    <input type="text" id="name" data-name list="namesList">
+
+
+                    <datalist id="namesList">
+                        <option value="event"></option>
+                        <option value="eventik"></option>
+                        <option value="bday"></option>
+                        <option value="birthday"></option>
+                        <option value="BD"></option>
+                        <option value="New Year"></option>
+                        <option value="Eve"></option>
+                        <option value="Russia Day"></option>
+                        <option value="Meeting"></option>
+                        <option value="Work Meeting"></option>
+                    </datalist>
                 </div>
                 <div class="is-all-day">
                     <input type="checkbox" name="" id="is-all-day" data-allDay>
@@ -451,14 +672,19 @@
                     </div>
                 </div>
                 <div class="colors">
-                    <label for="color-1" class="color color-blue"></label>
-                    <label for="color-2" class="color color-red"></label>
-                    <label for="color-3" class="color color-green"></label>
                     <input type="radio" name="colors" id="color-1" checked>
+                    <label for="color-1" class="color color-blue"></label>
+
                     <input type="radio" name="colors" id="color-2">
+                    <label for="color-2" class="color color-red"></label>
+
                     <input type="radio" name="colors" id="color-3">
+                    <label for="color-3" class="color color-green"></label>
                 </div>
-                <button type="submit">Add</button>
+                <div class="buttons">
+                    <button type="submit" class="btn btn--success">Update</button>
+                    <button type="submit" class="btn btn--error" deleteBtn>Delete</button>
+                </div>
             </form>
         </div>
         <div class="modalbg" data-modalBg>
@@ -471,12 +697,11 @@
             today
         </button>
         <button data-prevMonthBtn>
-            previous month
-        </button>
-        <button data-nextMonthBtn>
-            next month
-        </button>
-        <h2 data-calendarSelected></h2>
+            < </button>
+                <button data-nextMonthBtn>
+                    >
+                </button>
+                <h2 data-calendarSelected></h2>
     </div>
     <div class="calendar-container" data-days-container></div>
 </body>
